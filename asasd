@@ -1,0 +1,54 @@
+package com.featherlite;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
+
+public class FeatherLiteClient implements ClientModInitializer {
+    private static final String CATEGORY = "category.featherlite";
+
+    public static KeyBinding toggleSprintKey;
+    public static KeyBinding toggleHudKey;
+
+    public static boolean sprintToggled = false;
+    public static boolean hudVisible = true;
+
+    @Override
+    public void onInitializeClient() {
+        toggleSprintKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.featherlite.toggle_sprint", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_R, CATEGORY));
+        toggleHudKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.featherlite.toggle_hud", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY));
+
+        ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
+        HudRenderCallback.EVENT.register(new HudRenderer());
+    }
+
+    private void onTick(MinecraftClient client) {
+        if (client.player == null) return;
+
+        while (toggleSprintKey.wasPressed()) {
+            sprintToggled = !sprintToggled;
+            client.player.sendMessage(
+                    Text.literal("Toggle Sprint: " + (sprintToggled ? "ON" : "OFF")), true);
+        }
+        while (toggleHudKey.wasPressed()) {
+            hudVisible = !hudVisible;
+        }
+
+        // Keep sprinting while toggled on and the player is moving forward.
+        if (sprintToggled
+                && client.options.forwardKey.isPressed()
+                && !client.player.isSneaking()
+                && !client.player.horizontalCollision
+                && client.player.getHungerManager().getFoodLevel() > 6) {
+            client.player.setSprinting(true);
+        }
+    }
+}
