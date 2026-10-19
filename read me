@@ -1,0 +1,25 @@
+# FeatherLite
+
+A lightweight client-side Fabric mod for Minecraft 1.20.1, inspired by Feather Client's HUD mods.
+
+## Features
+- FPS counter
+- CPS counter (left | right)
+- Keystrokes display (WASD, mouse buttons with CPS, space)
+- Armor and held-item status with colored durability
+- Coordinates and facing direction
+- Toggle Sprint (default key **R**)
+- Toggle the whole HUD (default key **H**)
+
+Hidden automatically while the F3 debug screen or F1 is active. Keys can be rebound under Options > Controls > FeatherLite.
+
+## Build
+Requires JDK 17 and internet access to Fabric's maven.
+
+    gradle wrapper --gradle-version 8.5   # once, if no wrapper is present
+    ./gradlew build
+
+The jar is created in `build/libs/` (use the one without `-sources`). Drop it into your `mods` folder along with Fabric API 0.92.2+1.20.1 and Fabric Loader 0.15.11 or newer.
+
+## Dev run
+    ./gradlew runClient
